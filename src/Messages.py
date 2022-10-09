@@ -10,8 +10,10 @@ class Messages(object):
         self.vk_api = vk_api
         self.random_id = random.randint(-1024, 1024)
 
-        self.urls = self._get_urls()
-        self.messages = self._get_messages()
+        self.urls = self._get_file('urls')
+        self.messages = self._get_file('messages')
+        self.users = self._get_file('users')
+        self.commands = self._get_file('commands')
 
         self.start_week = datetime(2022, 9, 1).isocalendar()[1]
 
@@ -23,11 +25,14 @@ class Messages(object):
         :param args: positional arguments
         :param kwargs: key arguments
         """
+        command = command.lower()
         try:
             eval(f'self.command_{command}(*{args}, **{kwargs})')
         except AttributeError:
             raise AttributeError(f'You do not have these attributes {args}, {kwargs} on this function'
                                  f'self.command_{command}')
+        except SyntaxError:
+            raise SyntaxError(f'This command self.command_{command} does not exist')
 
     def send_message(self, message: str, attachment: str = None) -> None:
         """
@@ -53,11 +58,6 @@ class Messages(object):
         self.send_message(self.messages['week'] + f'{datetime.now().isocalendar()[1] - self.start_week + 1}')
 
     @staticmethod
-    def _get_urls():
-        with open('json/urls.json') as file:
-            return json.load(file)
-
-    @staticmethod
-    def _get_messages():
-        with open('json/messages.json') as file:
+    def _get_file(filepath):
+        with open(f'json/{filepath}.json', 'r') as file:
             return json.load(file)
