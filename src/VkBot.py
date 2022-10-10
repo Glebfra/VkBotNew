@@ -1,35 +1,39 @@
-import json
-
+import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 
+from src.Keyboard import Keyboard
 from src.Messages import Messages
+from src.additional import load_json_file
 
 
 class VkBot(object):
     def __init__(self, vk):
         self.vk = vk
-        self.longpool = VkLongPoll(self.vk)
+        self.longpool = VkLongPoll(self.vk, wait=25)
         self.vk_api = vk.get_api()
 
-        self.user_thread = []
+        self.ids = load_json_file('users')
+        self.commands = load_json_file('commands')
 
-        # Downloading the users
-        with open('json/users.json', 'r') as file:
-            self.ids = json.load(file)
         self.messages_threads = {user_id: Messages(self.vk_api, user_id) for user_id in self.ids['users']}
+        self.keyboard_threads = {user_id: Keyboard(self.vk_api, user_id) for user_id in self.ids['users']}
 
-        # Downloading the commands
-        with open('json/commands.json') as file:
-            self.commands = json.load(file)
+    @classmethod
+    def create_bot(cls, token_file='token.txt'):
+        with open(token_file, 'r') as file:
+            token = file.read()
+        vk = vk_api.VkApi(token=token)
+        return cls(vk)
 
-    def messages_logic(self, event):
-        pass
-
-    def message_loop(self):
+    def message_logic(self):
         for event in self._messages_listener():
-            self.messages_logic(event)
+            request = event.text.lower()
+            if request == 'начать':
+                self.keyboard_threads[event.user_id].send_keyboard()
+            elif request in self.commands:
+                self.messages_threads[event.user_id].run_command(command=self.commands[request])
 
     def _messages_listener(self):
         for event in self.longpool.listen():
-            if event.type == VkEventType.MESSAGE_NEW:
+            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 yield event
