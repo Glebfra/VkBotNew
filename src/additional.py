@@ -2,13 +2,20 @@ import json
 from datetime import datetime
 from threading import Thread
 
+from vk_api.longpoll import VkEventType
 
-def load_json_file(filename):
+
+def load_json_file(filename: str):
     with open(f'json/{filename}.json', 'r') as file:
         return json.load(file)
 
 
-def add_dict(filename, key, value):
+def update_json_file(filename: str, dictionary: dict):
+    with open(f'json/{filename}.json', 'w') as file:
+        json.dump(dictionary, file)
+
+
+def add_dict(filename: str, key: str, value: str):
     with open(f'json/{filename}.json', 'r') as file:
         dictionary = json.load(file)
 
@@ -34,3 +41,14 @@ def logging(func):
             file.write(f'{time}: {log}\n')
 
     return inner
+
+
+def append_dict(filename: str, key: str, value: str):
+    homework = load_json_file(filename)
+    homework[key].append(value)
+
+
+def messages_listener(longpool):
+    for event in longpool.listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+            yield event

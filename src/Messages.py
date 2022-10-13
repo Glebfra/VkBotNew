@@ -1,22 +1,26 @@
 import random
 
+from src.Keyboard import Keyboard
 from src.additional import *
 
 
-class Messages(object):
-    def __init__(self, vk_api, user_id):
+class Messages(Keyboard):
+    def __init__(self, vk_api, user_id, longpool):
+        super().__init__(vk_api, user_id)
+
         self.user_id = user_id
         self.vk_api = vk_api
+        self.longpool = longpool
 
         self.urls = load_json_file('urls')
         self.messages = load_json_file('messages')
 
         self.start_week = datetime(2022, 9, 1).isocalendar()[1]
 
-    @logging
-    def run_command(self, command: str):
-        exec(f'self.command_{command}()')
-        return f'User {self.user_id} used command {command}'
+    @parallel
+    def run_command(self, command: str, *args, **kwargs):
+        exec(f'self.command_{command}(*{args}, **{kwargs})')
+        self.send_keyboard()
 
     def send_message(self, message: str, attachment: str = None):
         self.vk_api.messages.send(
@@ -38,12 +42,13 @@ class Messages(object):
 
     def command_homework(self):
         homework = load_json_file('homework')
-        message = ''
-        for subject in homework:
-            message += f'-- {subject} -- задано: \n' \
-                       f'{homework[subject]}\n' \
-                       f'\n'
-        self.send_message(message)
+        self.init_homework_keyboard()
+        self.send_homework_keyboard(self.messages['get_homework_1'])
+
+    def command_create_homework(self):
+        homework = load_json_file('homework')
+        self.init_create_homework_keyboard()
+        self.send_create_homework_keyboard(self.messages['create_homework_1'])
 
     def command_birthday(self):
         self.send_message(self.messages['birthday'], attachment=self.urls['birthday'])
@@ -52,4 +57,6 @@ class Messages(object):
         self.send_message(self.messages['set_base'])
 
     def command_get_base(self):
-        pass
+        base = load_json_file('based')
+        self.send_message(f"{self.messages['get_base']}"
+                          f"{base[str(random.randint(0, len(base)-1))]}")
