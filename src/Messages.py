@@ -18,11 +18,11 @@ class Messages(Keyboard):
         self.start_week = datetime(2022, 9, 1).isocalendar()[1]
 
     @parallel
-    def run_command(self, command: str, *args, **kwargs):
+    def run_command(self, command: str, *args, **kwargs) -> None:
         exec(f'self.command_{command}(*{args}, **{kwargs})')
         self.send_keyboard()
 
-    def send_message(self, message: str, attachment: str = None):
+    def send_message(self, message: str, attachment: str = None) -> None:
         self.vk_api.messages.send(
             user_id=self.user_id,
             message=message,
@@ -30,33 +30,33 @@ class Messages(Keyboard):
             attachment=attachment
         )
 
-    def command_start(self):
+    def command_start(self) -> None:
         self.send_message(self.messages['start'])
 
-    def command_week(self):
+    def command_week(self) -> None:
         week = datetime.now().isocalendar()[1]
         self.send_message(f'{self.messages["week"]} {week - self.start_week + 1} неделя.')
 
-    def command_schedule(self):
+    def command_schedule(self) -> None:
         self.send_message(self.messages['schedule'], attachment=self.urls['schedule'])
 
-    def command_homework(self):
+    def command_homework(self) -> None:
         homework = load_json_file('homework')
         self.init_homework_keyboard()
         self.send_homework_keyboard(self.messages['get_homework_1'])
 
-    def command_create_homework(self):
+    def command_create_homework(self) -> None:
         homework = load_json_file('homework')
         self.init_create_homework_keyboard()
         self.send_create_homework_keyboard(self.messages['create_homework_1'])
 
-    def command_birthday(self):
+    def command_birthday(self) -> None:
         self.send_message(self.messages['birthday'], attachment=self.urls['birthday'])
 
-    def command_set_base(self):
+    def command_set_base(self) -> None:
         self.send_message(self.messages['set_base'])
 
-    def command_get_base(self):
+    def command_get_base(self) -> None:
         base = load_json_file('based')
         self.send_message(f"{self.messages['get_base']}"
                           f"{base[str(random.randint(0, len(base)-1))]}")
