@@ -5,24 +5,42 @@ from threading import Thread
 from vk_api.longpoll import VkEventType
 
 
-def load_json_file(filename: str):
-    with open(f'json/{filename}.json', 'r') as file:
-        return json.load(file)
+def load_json_file(filename: str) -> json:
+    try:
+        with open(f'json/{filename}.json', 'r') as file:
+            return json.load(file)
+
+    except:
+        return None
 
 
-def update_json_file(filename: str, dictionary: dict):
-    with open(f'json/{filename}.json', 'w') as file:
-        json.dump(dictionary, file)
+def update_json_file(filename: str, dictionary: dict) -> bool:
+    try:
+        with open(f'json/{filename}.json', 'w') as file:
+            json.dump(dictionary, file)
+        return True
+
+    except:
+        return False
 
 
-def add_dict(filename: str, key: str, value: str):
-    with open(f'json/{filename}.json', 'r') as file:
-        dictionary = json.load(file)
+def add_dict(filename: str, key: str, value: str) -> bool:
+    """
+    This function adds the value to json file and updates it
 
-    dictionary[key] = value
+    :param filename: Filename
+    :param key: key value of dictionary
+    :param value: value of dictionary
+    :return: boolean value (True) if everything's right (False) if not
+    """
+    try:
+        dictionary = load_json_file(filename)
+        dictionary[key] = value
+        update_json_file(filename, dictionary)
+        return True
 
-    with open(f'json/{filename}.json', 'w') as file:
-        json.dump(dictionary, file)
+    except:
+        return False
 
 
 def parallel(func):
