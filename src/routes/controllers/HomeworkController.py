@@ -6,17 +6,17 @@ from .AbstractController import AbstractController
 class HomeworkController(AbstractController):
     def __init__(self):
         super().__init__()
+        self.homework = self.get_json_file('homework')
 
     async def get_homework(self, message: Message, subject=None):
-        homework = self.get_json_file('homework')
-
-        response = ''
-        for subject in homework:
-            response += f'-- {subject} --\n' \
-                        f'{homework[subject]}\n\n'
+        response = f'-- {subject} --\n' \
+                   f'{self.homework[subject]}\n\n'
         await message.answer(response)
 
-    async def add_homework(self, message: Message, subject=None):
+    async def select_homework(self, message: Message):
+        pass
+
+    async def add_homework(self, message: Message):
         await message.answer('Метод добавления домашки')
 
     def get_file(self, filename):
