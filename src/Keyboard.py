@@ -26,7 +26,7 @@ class Keyboard(object):
             message=message
         )
 
-    def send_homework_keyboard(self, message: str = 'Обращайся ко мне еще :-)'):
+    def send_homework_keyboard(self, message: str = 'Выбери домашку, которую хочешь просмотреть'):
         self.vk_api.messages.send(
             user_id=self.user_id,
             random_id=random.randint(-1024, 1024),
@@ -34,7 +34,7 @@ class Keyboard(object):
             message=message
         )
 
-    def send_create_homework_keyboard(self, message: str = 'Обращайся ко мне еще :-)'):
+    def send_create_homework_keyboard(self, message: str = 'Выбери домашку, которую хочешь добавить или нажми кнопку добавить, чтобы добавить новый предмет'):
         self.vk_api.messages.send(
             user_id=self.user_id,
             random_id=random.randint(-1024, 1024),

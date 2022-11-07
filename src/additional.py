@@ -6,23 +6,32 @@ from vk_api.longpoll import VkEventType
 
 
 def load_json_file(filename: str):
-    with open(f'json/{filename}.json', 'r') as file:
+    with open(f'../json/{filename}.json', 'r') as file:
         return json.load(file)
 
 
 def update_json_file(filename: str, dictionary: dict):
-    with open(f'json/{filename}.json', 'w') as file:
+    with open(f'../json/{filename}.json', 'w') as file:
         json.dump(dictionary, file)
 
 
 def add_dict(filename: str, key: str, value: str):
-    with open(f'json/{filename}.json', 'r') as file:
+    with open(f'../json/{filename}.json', 'r') as file:
         dictionary = json.load(file)
 
     dictionary[key] = value
 
-    with open(f'json/{filename}.json', 'w') as file:
+    with open(f'../json/{filename}.json', 'w') as file:
         json.dump(dictionary, file)
+
+
+def load_file(filename: str):
+    try:
+        with open(f'../{filename}', 'r') as file:
+            response = file.read()
+        return response
+    except FileNotFoundError:
+        raise FileNotFoundError
 
 
 def parallel(func):

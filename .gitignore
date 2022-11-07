@@ -1,4 +1,5 @@
-token.txt
+../VkBot/token.txt
 .venv/*
 .idea/*
 json/*
+token.txt
